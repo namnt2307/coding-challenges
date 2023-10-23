@@ -1,0 +1,5 @@
+os.args[1] == "-n"
+-> Println(lineNumber) + Println(content)
+
+os.args[1] != "-n"
+-> Println(content) + error
