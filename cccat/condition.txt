@@ -1,5 +1,13 @@
-os.args[1] == "-n"
--> Println(lineNumber) + Println(content)
+len(os.Args) = 1
+-> readStdin
 
-os.args[1] != "-n"
--> Println(content) + error
+len(os.Args) = 2
+if os.Args[1] in ["-n","-b", "-"]
+    ->readStdin
+if os.Args[1] not in ["-n","-b","-"]
+    -> file = os.Args[1]
+    -> readFile
+len(os.Args) > 2
+    -> flag = os.args[1]
+    -> fileList = os.args[2:]
+    -> loop(readFile)

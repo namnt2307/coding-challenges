@@ -8,60 +8,76 @@ import (
 )
 
 func main() {
-	switch os.Args[1] {
-	case "-n":
-		readByLine(os.Args[2:])
-	case "-b":
-		readByLineLF(os.Args[2:])
+
+	if len(os.Args) == 1 {
+		read(os.Stdin, false)
+
+	} else if len(os.Args) == 2 {
+		switch os.Args[1] {
+		case "-":
+			read(os.Stdin, false)
+		case "-n":
+			read(os.Stdin, true)
+		case "-b":
+			read(os.Stdin, false)
+		default:
+			read(os.Args[1], false)
+		}
+
+	} else if len(os.Args) > 2 {
+		switch os.Args[1] {
+		case "-n":
+			for _, v := range os.Args[2:] {
+				read(v, true)
+			}
+		case "-b":
+			for _, v := range os.Args[2:] {
+				read(v, false)
+			}
+		default:
+			for _, v := range os.Args[1:] {
+				read(v, false)
+			}
+		}
+	}
+
+}
+
+func read(file interface{}, nb bool) {
+	var bs []byte
+	var err error
+	switch t := file.(type) {
+	case string:
+		bs, err = os.ReadFile(file.(string))
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	case *os.File:
+		bs, err = io.ReadAll(os.Stdin)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	default:
-		read(os.Args[1:])
+		fmt.Printf("%T", t)
+		fmt.Println("type wtf")
 	}
-
-}
-
-func read(fList []string) {
-
-	for _, file := range fList {
-		switch file {
-		case "-":
-			io.Copy(os.Stdout, os.Stdin)
-		default:
-			f, err := os.Open(file)
-			if err != nil {
-				fmt.Println(err)
-			}
-			io.Copy(os.Stdout, f)
-		}
-	}
-}
-func readByLineLF(fList []string) {
-
-}
-
-func readByLine(fList []string) {
-
-	for _, file := range fList {
-		switch file {
-		case "-":
-			io.Copy(os.Stdout, os.Stdin)
-		case "":
-			io.Copy(os.Stdout, os.Stdin)
-		default:
-			bs, err := os.ReadFile(file)
-			if err != nil {
-				fmt.Println(err)
-			}
-			printTextByLine(bs)
-
-		}
-	}
-}
-
-func printTextByLine(bs []byte) {
 	s := string(bs)
-	trim := strings.TrimSpace(s)
-	splittedString := strings.Split(trim, "\n")
-	for n := 0; n < len(splittedString); n++ {
-		fmt.Println(n+1, splittedString[n])
+
+	splittedString := strings.Split(s, "\n")
+	n := 1
+	for _, v := range splittedString {
+		if nb == true {
+			fmt.Println(n, v)
+			n++
+		} else {
+			if v == "" {
+				fmt.Println(v)
+				continue
+			}
+			fmt.Println(n, v)
+			n++
+		}
 	}
 }
